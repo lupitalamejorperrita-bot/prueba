@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <!-- AR.js para A-Frame -->
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.8/aframe/build/aframe-ar.js"></script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs>
+      
+      <!-- Marcador Hiro -->
+      <a-marker preset="hiro">
+        <!-- Cubo rojo de prueba -->
+        <a-box position="0 0.5 0" material="color: red;"></a-box>
+      </a-marker>
+      
+      <!-- Cámara -->
+      <a-entity camera></a-entity>
+    </a-scene>
+  </body>
+</html>
