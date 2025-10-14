@@ -1,294 +1,313 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cine Kong 🍌</title>
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #000;
-      color: #fff;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #ffcc00;
-      color: #000;
-      text-align: center;
-      padding: 15px;
-      font-size: 24px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    header img {
-      width: 60px;
-      height: auto;
-    }
-    .cartelera {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-    .pelicula {
-      background-color: #111;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .pelicula:hover { transform: scale(1.05); }
-    .pelicula img {
-      width: 100%;
-      height: 300px;
-      object-fit: cover;
-    }
-    .pelicula h3 { margin: 10px 0; }
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 10;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background-color: #111;
-      padding: 20px;
-      border-radius: 10px;
-      width: 90%;
-      max-width: 700px;
-      text-align: center;
-      position: relative;
-      box-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
-    }
-    .modal-content iframe {
-      width: 100%;
-      height: 315px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-    .close {
-      position: absolute;
-      top: 10px; right: 15px;
-      font-size: 24px;
-      cursor: pointer;
-      color: #ffcc00;
-    }
-    select, input {
-      padding: 8px;
-      margin: 8px;
-      border-radius: 5px;
-      border: none;
-    }
-    .asientos-container {
-      margin-top: 10px;
-      text-align: center;
-    }
-    .pantalla {
-      background: #ffcc00;
-      color: #000;
-      padding: 5px;
-      margin: 10px auto;
-      width: 60%;
-      border-radius: 4px;
-      font-weight: bold;
-    }
-    .asientos {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
-      justify-content: center;
-      max-width: 250px;
-      margin: 0 auto;
-    }
-    .asiento {
-      background: #222;
-      border-radius: 4px;
-      padding: 8px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .asiento:hover { background: #ffcc00; color: #000; }
-    .asiento.ocupado { background: red; cursor: not-allowed; }
-    .asiento.seleccionado { background: #ffcc00; color: #000; }
-    .boton-comprar {
-      margin-top: 15px;
-      background: #ffcc00;
-      color: #000;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-    .boton-comprar:hover {
-      background: #ffd633;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cine Kong — Cartelera</title>
+<style>
+  /* -------- Palette & base -------- */
+  :root{
+    --kong-yellow:#FFD43B;
+    --kong-gold:#FACC15;
+    --bg:#fffaf0;
+    --card:#ffffff;
+    --muted:#6b7280;
+    --text:#0f172a;
+    --accent:#111827;
+    --seat-free:#e6f9d6;
+    --seat-taken:#ffd6d6;
+    --seat-selected:#ffdf80;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+  body{margin:0;background:linear-gradient(180deg,var(--bg),#fff);color:var(--text);-webkit-font-smoothing:antialiased}
+  header{display:flex;align-items:center;gap:14px;padding:18px 24px;background:linear-gradient(90deg,var(--kong-yellow),var(--kong-gold));box-shadow:0 6px 20px rgba(15,23,42,0.06)}
+  header img{height:60px;border-radius:10px}
+  header h1{margin:0;font-size:22px;font-weight:900;color:#000}
+  .wrap{max-width:1200px;margin:20px auto;padding:18px}
+
+  /* hero */
+  .hero{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .hero .lead{font-size:18px;font-weight:700}
+
+  /* grid */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .card{background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 10px 30px rgba(15,23,42,0.06);border:1px solid rgba(15,23,42,0.03)}
+  .poster{height:320px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .poster img{width:100%;height:100%;object-fit:cover;display:block}
+  .card-body{padding:14px}
+  .title{font-weight:800;font-size:18px;margin:0 0 6px}
+  .meta{color:var(--muted);font-size:14px;margin-bottom:10px}
+  .desc{font-size:14px;color:#333;margin-bottom:12px;min-height:44px}
+  .actions{display:flex;gap:8px}
+  .btn{background:var(--accent);color:var(--kong-yellow);padding:10px 12px;border-radius:10px;border:none;font-weight:800;cursor:pointer}
+  .btn.secondary{background:transparent;color:var(--accent);border:2px solid rgba(15,23,42,0.06);font-weight:700}
+
+  /* modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:60}
+  .modal{background:#fff;border-radius:12px;max-width:980px;width:100%;max-height:90vh;overflow:auto;padding:16px;box-shadow:0 30px 80px rgba(2,6,23,0.6)}
+  .modal .close{position:absolute;right:18px;top:14px;background:#fff;border-radius:8px;padding:6px;cursor:pointer;border:1px solid rgba(0,0,0,0.06)}
+  .movie-row{display:flex;gap:18px;flex-wrap:wrap}
+  .video-wrap{flex:1 1 620px;position:relative;padding-bottom:56.25%;height:0;border-radius:10px;overflow:hidden;box-shadow:0 10px 40px rgba(2,6,23,0.12)}
+  .video-wrap iframe{position:absolute;left:0;top:0;width:100%;height:100%;border:0}
+  .info-side{flex:0 0 320px;min-width:260px}
+
+  .info-side h2{margin:0 0 6px}
+  .info-side .muted{color:var(--muted);margin-bottom:10px}
+  .info-side label{display:block;margin-top:8px;font-weight:700;color:#333}
+  .info-side input[type="text"], .info-side input[type="date"], .info-side select, .info-side input[type="time"]{
+    width:100%;padding:10px;border-radius:8px;border:1px solid rgba(15,23,42,0.06);margin-top:6px;background:#fff
+  }
+
+  /* seats */
+  .screen{background:linear-gradient(90deg,#fff6d6,#fff);padding:8px;border-radius:8px;text-align:center;font-weight:800;color:#333;margin-bottom:10px;box-shadow:inset 0 -2px 0 rgba(0,0,0,0.04)}
+  .seats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .seat{padding:10px;border-radius:8px;background:var(--seat-free);text-align:center;cursor:pointer;border:1px solid rgba(0,0,0,0.06);font-weight:700}
+  .seat.taken{background:var(--seat-taken);cursor:not-allowed;color:#8b0000}
+  .seat.selected{background:var(--seat-selected);color:#000}
+  .seat-label-row{grid-column:1/-1;text-align:center;margin-bottom:6px;color:var(--muted);font-weight:700}
+
+  .buy-row{display:flex;gap:10px;align-items:center;margin-top:14px}
+  .buy{flex:1;background:linear-gradient(90deg,var(--kong-yellow),var(--kong-gold));color:#000;border:none;padding:12px;border-radius:10px;font-weight:900;cursor:pointer;box-shadow:0 10px 30px rgba(250,204,21,0.12)}
+  .price{font-weight:900;color:var(--accent)}
+
+  footer{padding:18px;text-align:center;color:var(--muted)}
+
+  @media(max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} .video-wrap{flex-basis:100%} .info-side{flex-basis:100%} }
+  @media(max-width:660px){ .grid{grid-template-columns:1fr} .poster{height:220px} .seat{padding:8px;font-size:14px} }
+</style>
 </head>
 <body>
   <header>
-    <img src="https://lupitalamejorperrita-bot.github.io/prueba/Cine_Logo.jpg" alt="Logo Cine Kong" />
-    Cine Kong 🍌
+    <img src="https://lupitalamejorperrita-bot.github.io/prueba/Cine_Logo.jpg" alt="Cine Kong logo">
+    <h1>Cine Kong</h1>
   </header>
 
-  <section class="cartelera">
-    <div class="pelicula" onclick="abrirModal('K-Pop Demon Hunters', 'https://www.youtube.com/embed/3KD_g7Czb6U', '7+', 'Un grupo de chicas K-pop que secretamente son cazadoras de demonios.')">
-      <img src="https://m.media-amazon.com/images/M/MV5BNDQ0ZjhhMTItOTZhNC00YjA4LWI2ZDYtZGVjMjAzZjE4M2VlXkEyXkFqcGc@._V1_.jpg" alt="K-Pop Demon Hunters">
-      <h3>K-Pop Demon Hunters</h3>
-    </div>
-    <div class="pelicula" onclick="abrirModal('Encanto', 'https://www.youtube.com/embed/CaimKeDcudo', 'TP', 'Una familia mágica vive en una casa encantada en Colombia.')">
-      <img src="https://m.media-amazon.com/images/M/MV5BMmM5MDE0ZGUtYTVhMi00ZWEzLWJjZjQtMTE0OTkzZTcxNDMwXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Encanto">
-      <h3>Encanto</h3>
-    </div>
-  </section>
-
-  <div id="modalPelicula" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="cerrarModal()">&times;</span>
-      <h2 id="tituloPelicula"></h2>
-      <iframe id="trailer" src="" allowfullscreen></iframe>
-      <p><strong>Clasificación:</strong> <span id="clasificacion"></span></p>
-      <p id="descripcion"></p>
-      <label>Selecciona fecha:</label>
-      <input type="date" id="fecha" />
-      <label>Selecciona hora:</label>
-      <select id="hora"></select>
-      <label>Tu nombre:</label>
-      <input type="text" id="nombre" placeholder="Escribe tu nombre" />
-      <div class="asientos-container">
-        <div class="pantalla">📽️ Pantalla</div>
-        <div id="asientos" class="asientos"></div>
+  <main class="wrap">
+    <div class="hero">
+      <div>
+        <div class="lead">Tu cine temático — entradas al instante</div>
+        <div class="muted">Selecciona una película y reserva tu asiento</div>
       </div>
-      <button class="boton-comprar" onclick="comprarBoleta()">Comprar Boleta 🍿</button>
+      <div style="text-align:right">
+        <div style="font-weight:800;font-size:14px">Precio</div>
+        <div class="price" style="font-size:20px">$6.000</div>
+      </div>
+    </div>
+
+    <section class="grid" id="movieGrid">
+      <!-- Cartelera generada por JS -->
+    </section>
+
+    <footer>© Cine Kong — Hecho con 🍌</footer>
+  </main>
+
+  <!-- Modal -->
+  <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-hidden="true">
+    <div class="modal" role="document">
+      <button class="close" id="closeModal" title="Cerrar">✕</button>
+      <div id="modalContent"></div>
     </div>
   </div>
 
-  <script>
-    let peliculaSeleccionada = {};
-    let asientoSeleccionado = null;
-    let asientosOcupados = new Set();
+<script>
+/* ========== Datos de películas (puedes ajustar los trailers/imagenes) ========== */
+const PRICE = 6000;
+const movies = [
+  { id:'kpdh', title:'K-Pop Demon Hunters', rating:'7+', desc:'Ídolos que luchan contra demonios entre conciertos y coreografías explosivas.', poster:'https://i.imgur.com/Wn5dL9Y.jpeg', trailer:'https://www.youtube.com/embed/Dy08jZ0YkeE', times:['11:00','13:30','16:00','19:30']},
+  { id:'encanto', title:'Encanto', rating:'TP', desc:'La mágica historia de la familia Madrigal y sus dones.', poster:'https://i.imgur.com/Xb7Qe9R.jpeg', trailer:'https://www.youtube.com/embed/CaimKeDcudo', times:['10:00','12:30','15:00','18:00']},
+  { id:'pdp', title:'Pokémon Detective Pikachu', rating:'PG', desc:'Un detective inesperado y su compañero Pikachu resuelven un misterio.', poster:'https://i.imgur.com/81yWcY2.jpeg', trailer:'https://www.youtube.com/embed/1roy4o4tqQM', times:['10:30','13:00','15:30','18:00']},
+  { id:'frozen2', title:'Frozen II', rating:'TP', desc:'Elsa y Anna en una nueva aventura para descubrir el origen de los poderes.', poster:'https://i.imgur.com/Tg4tdAb.jpeg', trailer:'https://www.youtube.com/embed/Zi4LMpSDccc', times:['10:15','13:15','16:15']},
+  { id:'jurassic', title:'Jurassic World: Dominion', rating:'12+', desc:'Dinosaurios y humanos conviven con consecuencias épicas.', poster:'https://i.imgur.com/79DVaPZ.jpeg', trailer:'https://www.youtube.com/embed/fb5ELWi-ekk', times:['12:00','15:30','19:00']},
+  { id:'barbie', title:'Barbie', rating:'PG-13', desc:'Una aventura brillante y reflexiva fuera de Barbieland.', poster:'https://i.imgur.com/SUbp4oy.jpeg', trailer:'https://www.youtube.com/embed/pBk4NYhWNMM', times:['11:00','14:00','17:00']},
+  { id:'sci', title:'Órbita Perdida', rating:'PG-13', desc:'Una estación espacial descubre vida inesperada.', poster:'https://i.imgur.com/0NFlD5g.jpeg', trailer:'https://www.youtube.com/embed/3fumBcKC6RE', times:['13:15','17:15','21:00']},
+  { id:'comedy', title:'Café y Caos', rating:'A', desc:'Comedia romántica que cambia la vida de un barrio.', poster:'https://i.imgur.com/ttHHB5P.jpeg', trailer:'https://www.youtube.com/embed/ZZ5LpwO-An4', times:['10:45','13:45','16:45']},
+  { id:'fantasy', title:'La Torre de Cristal', rating:'PG-13', desc:'Aventura fantástica en una torre que cambia cada noche.', poster:'https://i.imgur.com/qXciZoU.jpeg', trailer:'https://www.youtube.com/embed/4H6o8QGxkL8', times:['11:30','14:30','19:00']},
+  { id:'anim', title:'Pequeños Gigantes', rating:'A', desc:'Animación familiar sobre niños con un gran secreto.', poster:'https://i.imgur.com/ef12gh34.jpeg', trailer:'https://www.youtube.com/embed/8kK2zwjRV0M', times:['09:30','11:45','14:00']}
+];
 
-    function abrirModal(titulo, trailer, clasif, desc) {
-      peliculaSeleccionada = { titulo, trailer, clasif, desc };
-      document.getElementById("tituloPelicula").innerText = titulo;
-      document.getElementById("trailer").src = trailer + "?rel=0";
-      document.getElementById("clasificacion").innerText = clasif;
-      document.getElementById("descripcion").innerText = desc;
+/* ========== Render cartelera ========== */
+const movieGrid = document.getElementById('movieGrid');
+function renderPosters(){
+  movieGrid.innerHTML = '';
+  movies.forEach((m, idx) => {
+    const el = document.createElement('article');
+    el.className = 'card';
+    el.innerHTML = `
+      <div class="poster"><img src="${m.poster}" alt="${escapeHtml(m.title)}"></div>
+      <div class="card-body">
+        <div class="title">${escapeHtml(m.title)}</div>
+        <div class="meta">${escapeHtml(m.rating)}</div>
+        <div class="desc">${escapeHtml(m.desc)}</div>
+        <div class="actions">
+          <button class="btn" data-id="${m.id}" onclick="openMovieModal('${m.id}')">Ver detalles</button>
+          <button class="btn secondary" onclick="openTrailer('${m.trailer}')">Ver tráiler</button>
+        </div>
+      </div>
+    `;
+    movieGrid.appendChild(el);
+  });
+}
 
-      const horas = generarHorasPorDia();
-      const selectHoras = document.getElementById("hora");
-      selectHoras.innerHTML = "";
-      horas.forEach(h => {
-        const opt = document.createElement("option");
-        opt.textContent = h;
-        selectHoras.appendChild(opt);
+/* ========== Modal manejo ========== */
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalContent = document.getElementById('modalContent');
+const closeModalBtn = document.getElementById('closeModal');
+
+function openTrailer(trailerUrl){
+  // abrir trailer en nueva pestaña para evitar problemas de autoplay o bloqueo
+  window.open(trailerUrl.replace('embed/','watch?v='), '_blank');
+}
+
+function openMovieModal(id){
+  const m = movies.find(x=>x.id===id);
+  if(!m) return;
+  modalContent.innerHTML = `
+    <div class="movie-row">
+      <div class="video-wrap">
+        <iframe id="movieIframe" src="${m.trailer}" title="${escapeHtml(m.title)} - trailer" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+
+      <div class="info-side">
+        <h2>${escapeHtml(m.title)}</h2>
+        <div class="muted">${escapeHtml(m.rating)}</div>
+        <p style="margin-top:10px;color:#333">${escapeHtml(m.desc)}</p>
+
+        <label>Nombre del titular</label>
+        <input id="buyerName" type="text" placeholder="Tu nombre completo">
+
+        <label>Selecciona fecha</label>
+        <input id="dateInput" type="date" min="${getTodayISO()}">
+
+        <label>Selecciona hora</label>
+        <select id="timeSelect">
+          <option value="">Elige hora</option>
+          ${m.times.map(t=>`<option>${t}</option>`).join('')}
+        </select>
+
+        <div style="margin-top:12px">
+          <div class="screen">📽️ PANTALLA</div>
+          <div id="seatGridContainer">
+            <div class="seat-label-row">Elige tu asiento</div>
+            <div id="seatGrid" class="seats"></div>
+          </div>
+        </div>
+
+        <div class="buy-row">
+          <div style="flex:1">
+            <button id="buyBtn" class="buy">Comprar boleta — <span class="price">${formatCOP(PRICE)}</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // render seat grid (A-K rows, 5 cols)
+  renderSeatGrid('seatGrid');
+
+  // attach buy handler
+  document.getElementById('buyBtn').addEventListener('click', ()=> {
+    const name = document.getElementById('buyerName').value.trim();
+    const date = document.getElementById('dateInput').value;
+    const timeEl = document.getElementById('timeSelect');
+    const time = timeEl ? timeEl.value : '';
+    const seat = getSelectedSeatFromGrid('seatGrid');
+
+    if(!name){ alert('Ingresa el nombre del titular'); return; }
+    if(!date){ alert('Selecciona una fecha'); return; }
+    if(!time){ alert('Selecciona una hora'); return; }
+    if(!seat){ alert('Selecciona un asiento'); return; }
+
+    // abrir boleta.html en nueva pestaña con parámetros (robusto en carpetas)
+    const params = new URLSearchParams({
+      pelicula: m.title,
+      nombre: name,
+      fecha: date,
+      hora: time,
+      asiento: seat
+    }).toString();
+
+    const basePath = window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1);
+    const url = basePath + "boleta.html?" + params;
+    window.open(url, '_blank');
+    // marcar asiento como tomado en sesión
+    markSeatTaken(seat);
+    closeModal();
+  });
+
+  // show modal
+  modalBackdrop.style.display = 'flex';
+}
+
+function closeModal(){ modalBackdrop.style.display = 'none'; modalContent.innerHTML = ''; }
+closeModalBtn.addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', (e)=>{ if(e.target===modalBackdrop) closeModal(); });
+
+/* ========== Seats logic ==========
+   Rows A..K (11 rows), Columns 1..5
+   Occupied seats: all row K, and seat B3 (as requested)
+====================================*/
+const ROWS = 11; // A..K
+const COLS = 5;
+const takenSeatsGlobal = new Set(); // store 'A1' style
+
+// pre-mark occupied: row K (11th row) and B3
+(function markInitialTaken(){
+  // row letters
+  for(let r=0;r<ROWS;r++){
+    const rowChar = String.fromCharCode(65 + r); // A=65
+    if(rowChar === 'K'){
+      for(let c=1;c<=COLS;c++) takenSeatsGlobal.add(`${rowChar}${c}`);
+    }
+  }
+  takenSeatsGlobal.add('B3');
+})();
+
+function renderSeatGrid(containerId){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  container.innerHTML = '';
+  for(let r=0;r<ROWS;r++){
+    for(let c=1;c<=COLS;c++){
+      const label = String.fromCharCode(65 + r) + c;
+      const el = document.createElement('div');
+      el.className = 'seat';
+      el.textContent = label;
+      if(takenSeatsGlobal.has(label)) el.classList.add('taken');
+      el.addEventListener('click', ()=>{
+        if(el.classList.contains('taken')) return;
+        // deselect siblings
+        const siblings = container.querySelectorAll('.seat');
+        siblings.forEach(s=>s.classList.remove('selected'));
+        el.classList.add('selected');
       });
-
-      asientosOcupados = generarAsientosOcupados();
-      actualizarCuadriculaAsientos();
-
-      document.getElementById("modalPelicula").style.display = "flex";
+      container.appendChild(el);
     }
+  }
+}
 
-    function cerrarModal() {
-      document.getElementById("modalPelicula").style.display = "none";
-      document.getElementById("trailer").src = "";
-    }
+function getSelectedSeatFromGrid(containerId){
+  const container = document.getElementById(containerId);
+  if(!container) return null;
+  const s = container.querySelector('.seat.selected');
+  return s ? s.textContent : null;
+}
 
-    function actualizarCuadriculaAsientos() {
-      const cont = document.getElementById("asientos");
-      cont.innerHTML = "";
-      const filas = "ABCDEFGHIJK";
-      filas.split("").forEach(f => {
-        for (let n = 1; n <= 5; n++) {
-          const div = document.createElement("div");
-          const id = f + n;
-          div.className = "asiento";
-          div.textContent = id;
-          if (asientosOcupados.has(id)) div.classList.add("ocupado");
-          div.onclick = () => seleccionarAsiento(div, id);
-          cont.appendChild(div);
-        }
-      });
-    }
+function markSeatTaken(label){
+  if(!label) return;
+  takenSeatsGlobal.add(label);
+  // if modal still open, re-render to reflect taken states
+  const seatGrid = document.getElementById('seatGrid');
+  if(seatGrid) renderSeatGrid('seatGrid');
+}
 
-    function seleccionarAsiento(div, id) {
-      if (div.classList.contains("ocupado")) return;
-      document.querySelectorAll(".asiento").forEach(a => a.classList.remove("seleccionado"));
-      div.classList.add("seleccionado");
-      asientoSeleccionado = id;
-    }
+/* ========== Utils =========*/
+function getTodayISO(){ const t=new Date(); return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`; }
+function formatCOP(n){ return '$' + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+function escapeHtml(s){ return (s+'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-    function comprarBoleta() {
-      const nombre = document.getElementById("nombre").value.trim();
-      const fecha = document.getElementById("fecha").value;
-      const hora = document.getElementById("hora").value;
-      if (!nombre || !fecha || !hora || !asientoSeleccionado) {
-        alert("Por favor, completa todos los campos y selecciona un asiento.");
-        return;
-      }
-      const params = new URLSearchParams({
-        pelicula: peliculaSeleccionada.titulo,
-        nombre,
-        fecha,
-        hora,
-        asiento: asientoSeleccionado
-      });
-      window.location.href = "boleta.html?" + params.toString();
-    }
-
-    // ----------- Horarios por día -----------
-    function generarHorasPorDia() {
-      const hoy = new Date().getDay(); // 0 = Domingo
-      let rango = [];
-      if (hoy >= 1 && hoy <= 4) rango = [9, 20];       // Lunes-Jueves
-      else if (hoy === 5) rango = [12, 23];            // Viernes
-      else rango = [9, 24];                            // Sábado-Domingo
-
-      const cantidad = Math.floor(Math.random() * 3) + 3;
-      const horas = [];
-      for (let i = 0; i < cantidad; i++) {
-        const h = Math.floor(Math.random() * (rango[1] - rango[0])) + rango[0];
-        const m = Math.random() > 0.5 ? "00" : "30";
-        const suf = h >= 12 ? "PM" : "AM";
-        const hora12 = h > 12 ? h - 12 : h;
-        horas.push(`${hora12}:${m} ${suf}`);
-      }
-      return horas.sort((a, b) => convertirHora24(a) - convertirHora24(b));
-    }
-
-    function convertirHora24(hora12) {
-      const [h, rest] = hora12.split(":");
-      const [min, suf] = rest.split(" ");
-      let hh = parseInt(h);
-      if (suf === "PM" && hh !== 12) hh += 12;
-      if (suf === "AM" && hh === 12) hh = 0;
-      return hh * 60 + parseInt(min);
-    }
-
-    // ----------- Asientos aleatorios -----------
-    function generarAsientosOcupados() {
-      const ocupados = new Set();
-      const filas = "ABCDEFGHIJK";
-      const cantidad = Math.floor(Math.random() * 8) + 8;
-      while (ocupados.size < cantidad) {
-        const f = filas[Math.floor(Math.random() * filas.length)];
-        const c = Math.floor(Math.random() * 5) + 1;
-        ocupados.add(`${f}${c}`);
-      }
-      return ocupados;
-    }
-  </script>
+/* ========== Init =========*/
+renderPosters();
+</script>
 </body>
 </html>
