@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Validar Boleta — Cine Kong</title>
+<style>
+  body{font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#fff9d6;margin:0;padding:40px;text-align:center}
+  img{width:120px;margin-bottom:12px}
+  h1{margin:6px 0 0}
+  .msg{margin-top:20px;font-size:1.3rem;font-weight:700}
+  .ok{color:green}
+  .used{color:#c0392b}
+  .info{margin-top:12px;color:#444}
+  button{margin-top:18px;padding:10px 16px;border-radius:10px;border:none;background:#f0d000;font-weight:800;cursor:pointer}
+</style>
+</head>
+<body>
+  <img src="https://lupitalamejorperrita-bot.github.io/prueba/Cine_Logo.jpg" alt="Cine Kong">
+  <h1>Verificación de Boleta</h1>
+
+  <div id="resultado" class="msg">Comprobando…</div>
+  <div id="detalle" class="info"></div>
+
+  <div>
+    <button id="volver">Volver</button>
+  </div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const codigo = params.get('codigo');
+
+  const resultadoEl = document.getElementById('resultado');
+  const detalleEl = document.getElementById('detalle');
+  const volverBtn = document.getElementById('volver');
+  volverBtn.addEventListener('click', ()=>{ window.location.href = '/prueba/CineKong/index.html'; });
+
+  if(!codigo){
+    resultadoEl.textContent = 'Código no válido';
+    resultadoEl.className = 'msg used';
+    detalleEl.textContent = 'No se recibió ningún código en la URL.';
+  } else {
+    // clave en localStorage específica por boleto
+    const localKey = 'cinekong_boleto_' + codigo;
+
+    // comprobar si ese código ya está marcado como usado
+    const estado = localStorage.getItem(localKey);
+
+    if(estado === 'usado'){
+      resultadoEl.innerHTML = '⚠️ Este boleto ya fue disfrutado';
+      resultadoEl.className = 'msg used';
+      detalleEl.textContent = `Código: ${codigo}`;
+    } else {
+      // marcar como usado ahora mismo
+      localStorage.setItem(localKey, 'usado');
+      resultadoEl.innerHTML = '✅ Listo, disfruta tu función 🍿';
+      resultadoEl.className = 'msg ok';
+      detalleEl.textContent = `Código: ${codigo} (marcado como usado)`;
+    }
+  }
+</script>
+</body>
+</html>
